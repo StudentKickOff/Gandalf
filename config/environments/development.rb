@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Isengard::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -23,11 +25,10 @@ Isengard::Application.configure do
   config.active_record.migration_error = :page_load
 
   # Set default mail address
-  config.action_mailer.default_options = { from: "no-reply@localhost" }
+  config.action_mailer.default_options = { from: 'no-reply@localhost' }
 
   # Set these so devise works in development
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
-
+  config.action_mailer.default_url_options = { host: 'localhost:3000' }
 
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateEnrolledClubsAssociation < ActiveRecord::Migration
   def change
     create_join_table :clubs, :users, table_name: :enrolled_clubs_members do |t|

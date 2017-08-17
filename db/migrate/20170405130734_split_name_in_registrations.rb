@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SplitNameInRegistrations < ActiveRecord::Migration
   def change
     rename_column :registrations, :name, :lastname

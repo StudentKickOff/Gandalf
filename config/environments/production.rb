@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Isengard::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -66,7 +68,7 @@ Isengard::Application.configure do
   # config.action_mailer.raise_delivery_errors = false
   #
   # Set default mail address
-  config.action_mailer.default_options = { from: "no-reply@events.ugent.be" }
+  config.action_mailer.default_options = { from: 'no-reply@events.ugent.be' }
 
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = { host: 'events.ugent.be' }

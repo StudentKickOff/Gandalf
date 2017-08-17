@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPhoneNumberEnumToEvent < ActiveRecord::Migration
   def change
     add_column :events, :phone_number_state, :string, default: 'optional'

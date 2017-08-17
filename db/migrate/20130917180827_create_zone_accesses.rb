@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateZoneAccesses < ActiveRecord::Migration
   def change
     create_table :zone_accesses do |t|

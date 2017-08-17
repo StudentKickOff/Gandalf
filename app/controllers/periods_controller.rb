@@ -1,5 +1,6 @@
-class PeriodsController < ApplicationController
+# frozen_string_literal: true
 
+class PeriodsController < ApplicationController
   # You need to be logged in for everything.
   before_action :authenticate_user!
 
@@ -32,5 +33,4 @@ class PeriodsController < ApplicationController
     @id = period.id
     period.destroy
   end
-
 end

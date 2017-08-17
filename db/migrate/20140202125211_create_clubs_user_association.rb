@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateClubsUserAssociation < ActiveRecord::Migration
   def change
     create_table :clubs_users, id: false do |t|

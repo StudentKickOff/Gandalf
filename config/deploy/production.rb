@@ -1,9 +1,11 @@
-server 'events.ugent.be', user: 'events', roles: %w{web app db},
-  ssh_options: {
-    forward_agent: true,
-    auth_methods: ['publickey'],
-    port: 2222
-  }
+# frozen_string_literal: true
+
+server 'events.ugent.be', user: 'events', roles: %w[web app db],
+                          ssh_options: {
+                            forward_agent: true,
+                            auth_methods: ['publickey'],
+                            port: 2222
+                          }
 
 set :rails_env, 'production'
 set :rbenv_type, :system

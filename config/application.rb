@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
@@ -5,7 +7,7 @@ require 'rails/all'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
-I18n.available_locales = [:en, :nl]
+I18n.available_locales = %i[en nl]
 
 module Isengard
   class Application < Rails::Application
@@ -21,8 +23,8 @@ module Isengard
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = :nl
 
-    config.assets.paths << Rails.root.join("app", "assets", "fonts")
-    config.assets.paths << Rails.root.join("app", "assets", "fonts", "panno")
-    config.assets.paths << Rails.root.join("app", "assets", "fonts", "iconfont")
+    config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
+    config.assets.paths << Rails.root.join('app', 'assets', 'fonts', 'panno')
+    config.assets.paths << Rails.root.join('app', 'assets', 'fonts', 'iconfont')
   end
 end

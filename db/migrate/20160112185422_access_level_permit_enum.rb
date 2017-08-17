@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class AccessLevelPermitEnum < ActiveRecord::Migration
   def up
-    add_column :access_levels, :permit, :string, :default => :everyone
+    add_column :access_levels, :permit, :string, default: :everyone
     AccessLevel.all.each do |a|
       a.update_attribute :permit, :members if a.member_only
     end

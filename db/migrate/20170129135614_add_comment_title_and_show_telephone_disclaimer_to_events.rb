@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddCommentTitleAndShowTelephoneDisclaimerToEvents < ActiveRecord::Migration
   def change
     add_column :events, :comment_title, :string

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddConfirmedBooleanToPartners < ActiveRecord::Migration
   def up
     add_column :partners, :confirmed, :boolean

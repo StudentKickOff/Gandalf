@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -22,7 +24,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.0'
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-install_if -> {RUBY_PLATFORM !~ /darwin/} do
+install_if -> { RUBY_PLATFORM !~ /darwin/ } do
   gem 'therubyracer', platforms: :ruby
 end
 
@@ -78,7 +80,7 @@ group :production, :deployment do
 end
 
 # Barcodes
-gem 'barcodes', git: "git://github.com/nudded/barcodes"
+gem 'barcodes', git: 'git://github.com/nudded/barcodes'
 
 # Pagination
 gem 'will_paginate', '~> 3.0'
@@ -142,8 +144,8 @@ group :development do
 
   gem 'capistrano', '~> 3.1'
   gem 'capistrano-rails', '~> 1.1'
-  gem 'capistrano-rvm'
   gem 'capistrano-rbenv'
+  gem 'capistrano-rvm'
 end
 
 group :development, :test do

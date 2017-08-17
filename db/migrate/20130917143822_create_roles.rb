@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateRoles < ActiveRecord::Migration
   def change
     create_table :roles do |t|
@@ -7,6 +9,6 @@ class CreateRoles < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :roles, [:person_id, :event_id, :role_name_id], unique: true
+    add_index :roles, %i[person_id event_id role_name_id], unique: true
   end
 end

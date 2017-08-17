@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -28,7 +30,7 @@ class User < ActiveRecord::Base
   after_create :fetch_club, :fetch_enrolled_clubs
 
   has_and_belongs_to_many :clubs
-  has_and_belongs_to_many :enrolled_clubs, join_table: :enrolled_clubs_members, class_name: "Club"
+  has_and_belongs_to_many :enrolled_clubs, join_table: :enrolled_clubs_members, class_name: 'Club'
 
   # return the club this user can manage
   def fetch_club
@@ -37,10 +39,10 @@ class User < ActiveRecord::Base
     end
 
     # using httparty because it is much easier to read than net/http code
-    resp = HTTParty.get(Rails.application.secrets.fk_auth_url, :query => {
-              :k => digest(username, Rails.application.secrets.fk_auth_key),
-              :u => username
-           })
+    resp = HTTParty.get(Rails.application.secrets.fk_auth_url, query: {
+                          k: digest(username, Rails.application.secrets.fk_auth_key),
+                          u: username
+                        })
 
     # this will only return the club name if control-hash matches
     if resp.body != 'FAIL'
@@ -53,7 +55,7 @@ class User < ActiveRecord::Base
       if hash['controle'] == dig
         self.clubs = Club.where(internal_name: clubs_dig)
       end
-      self.save!
+      save!
     end
   end
 
@@ -72,21 +74,19 @@ class User < ActiveRecord::Base
       when :ugentID
         self.cas_ugentStudentID = value
       when :ugentStudentID
-        unless Rails.env.production? # field is only available in production
-          self.cas_ugentStudentID = value
-        end
+        self.cas_ugentStudentID = value unless Rails.env.production? # field is only available in production
       when :mail
         self.cas_mail = value
       when :uid
         self.cas_uid = value
       end
     end
-    self.save!
+    save!
   end
 
   # return Givenname + surname or username if these don't exist
   def display_name
-    if cas_surname and cas_givenname
+    if cas_surname && cas_givenname
       cas_givenname + ' ' + cas_surname
     else
       username
@@ -95,14 +95,14 @@ class User < ActiveRecord::Base
 
   # fetch clubs where user is enrolled in
   def fetch_enrolled_clubs
-    resp = HTTParty.get("http://registratie.fkgent.be/api/v2/members/clubs_for_ugent_nr.json", query:
-                 {key: Rails.application.secrets.enrollment_key, ugent_nr: self.cas_ugentStudentID})
+    resp = HTTParty.get('http://registratie.fkgent.be/api/v2/members/clubs_for_ugent_nr.json', query:
+                 { key: Rails.application.secrets.enrollment_key, ugent_nr: cas_ugentStudentID })
 
     if resp.code == 200
-      clubs = JSON[resp.body].map(&:downcase).map {|c| c.gsub('-','')}
-      if !clubs.empty?
+      clubs = JSON[resp.body].map(&:downcase).map { |c| c.delete('-') }
+      unless clubs.empty?
         self.enrolled_clubs = Club.where(internal_name: clubs)
-        self.save!
+        save!
       end
     end
   end

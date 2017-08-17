@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -9,9 +11,7 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     I18n.locale = params[:locale] || session[:locale] || I18n.default_locale
-    if params[:locale]
-      session[:locale] = params[:locale]
-    end
+    session[:locale] = params[:locale] if params[:locale]
   end
 
   def store_location
@@ -24,16 +24,15 @@ class ApplicationController < ActionController::Base
     redirect_to root_path
   end
 
-  def after_sign_in_path_for(resource)
+  def after_sign_in_path_for(_resource)
     session[:previous_url] || root_path
   end
 
   def current_ability
-    if current_partner
-      @current_ability ||= Ability.new(current_partner)
-    else
-      @current_ability ||= Ability.new(current_user)
-    end
+    @current_ability ||= if current_partner
+                           Ability.new(current_partner)
+                         else
+                           Ability.new(current_user)
+                         end
   end
-
 end

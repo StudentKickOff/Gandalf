@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateZones < ActiveRecord::Migration
   def change
     create_table :zones do |t|
@@ -6,6 +8,6 @@ class CreateZones < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :zones, [:name, :event_id], unique: true
+    add_index :zones, %i[name event_id], unique: true
   end
 end

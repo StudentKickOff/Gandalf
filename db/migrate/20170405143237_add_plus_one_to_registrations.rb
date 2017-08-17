@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPlusOneToRegistrations < ActiveRecord::Migration
   def change
     add_column :events, :allow_plus_one, :boolean

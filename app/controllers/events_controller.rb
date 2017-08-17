@@ -1,10 +1,10 @@
 # encoding: UTF-8
+# frozen_string_literal: true
 
 class EventsController < ApplicationController
-
   # order is important here, we need to be authenticated before we can check permission
-  before_filter :authenticate_user!, except: [:show, :index]
-  load_and_authorize_resource only: [:new, :show, :update, :edit, :destroy]
+  before_filter :authenticate_user!, except: %i[show index]
+  load_and_authorize_resource only: %i[new show update edit destroy]
 
   respond_to :html, :js, :ics
 
@@ -17,7 +17,7 @@ class EventsController < ApplicationController
 
   def show
     @registration = @event.registrations.build
-    #TODO: fix me: change to correct CAS attribute
+    # TODO: fix me: change to correct CAS attribute
     if current_user
       @registration.firstname = current_user.display_name.split(' ', 2).first
       @registration.lastname = current_user.display_name.split(' ', 2).last
@@ -26,11 +26,9 @@ class EventsController < ApplicationController
     end
   end
 
-  def new
-  end
+  def new; end
 
-  def edit
-  end
+  def edit; end
 
   def destroy
     @event.destroy
@@ -41,7 +39,7 @@ class EventsController < ApplicationController
     authorize! :update, @event
 
     if @event.update(event_params)
-      flash.now[:success] = "Successfully updated event."
+      flash.now[:success] = 'Successfully updated event.'
     end
 
     render action: :edit
@@ -68,17 +66,17 @@ class EventsController < ApplicationController
     @event = Event.find params.require(:id)
     authorize! :view_stats, @event
 
-    if not @event.registrations.empty?
+    if !@event.registrations.empty?
 
       min, max = @event.registrations.pluck(:created_at).minmax
       zeros = Hash[]
       while min <= max
-        zeros[min.strftime("%Y-%m-%d")] = 0
+        zeros[min.strftime('%Y-%m-%d')] = 0
         min += 1.day
       end
 
       @data = @event.access_levels.map do |al|
-        {name: al.name, data: zeros.merge(al.registrations.group('date(registrations.created_at)').count)}
+        { name: al.name, data: zeros.merge(al.registrations.group('date(registrations.created_at)').count) }
       end
 
     else
@@ -101,11 +99,10 @@ class EventsController < ApplicationController
   def scan_name
     @event = Event.find params.require(:id)
     authorize! :update, @event
-    #TODO: fix me search by combination of first and lastname
+    # TODO: fix me search by combination of first and lastname
     @registration = @event.registrations.find_by lastname: params.require(:name)
     check_in
   end
-
 
   def export_status
     @event = Event.find params.require(:id)
@@ -120,7 +117,7 @@ class EventsController < ApplicationController
   def generate_export
     @event = Event.find params.require(:id)
     authorize! :read, @event
-    @event.export_status = "generating"
+    @event.export_status = 'generating'
     @event.save
     @event.generate_xls
   end
@@ -132,22 +129,22 @@ class EventsController < ApplicationController
   end
 
   private
-  def check_in
 
+  def check_in
     if @registration
-      if not @registration.is_paid
+      if !@registration.is_paid
         flash.now[:warning] =
-          "Person has not paid yet! Resting amount: €" + @registration.to_pay.to_s
+          'Person has not paid yet! Resting amount: €' + @registration.to_pay.to_s
       elsif @registration.checked_in_at
-        flash.now[:warning] = "Person already checked in at " +
-          view_context.nice_time(@registration.checked_in_at) + "!"
+        flash.now[:warning] = 'Person already checked in at ' +
+                              view_context.nice_time(@registration.checked_in_at) + '!'
       else
-        flash.now[:success] = "Person has been scanned!"
+        flash.now[:success] = 'Person has been scanned!'
         @registration.checked_in_at = Time.now
         @registration.save!
       end
     else
-      flash.now[:error] = "Registration not found"
+      flash.now[:error] = 'Registration not found'
     end
     render action: :scan
   end

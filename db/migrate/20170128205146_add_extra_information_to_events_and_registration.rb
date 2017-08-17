@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddExtraInformationToEventsAndRegistration < ActiveRecord::Migration
   def change
     add_column :events, :extra_info, :boolean, default: false

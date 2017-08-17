@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: events
@@ -35,7 +37,6 @@
 #
 
 class Event < ActiveRecord::Base
-
   belongs_to :club
 
   has_many :access_levels, dependent: :destroy
@@ -45,7 +46,6 @@ class Event < ActiveRecord::Base
   has_many :promos, dependent: :destroy
 
   has_many :periods, dependent: :destroy
-
 
   validates :description, presence: true
   validates :end_date, presence: true
@@ -59,19 +59,18 @@ class Event < ActiveRecord::Base
   validates :contact_email, email: true
   validates_with IBANValidator
 
-
   validates_datetime :end_date, after: :start_date
   validates_datetime :registration_close_date, after: :registration_open_date,
-    unless: lambda { |o| o.registration_close_date.blank? or o.registration_open_date.blank? }
+                                               unless: ->(o) { o.registration_close_date.blank? || o.registration_open_date.blank? }
 
   has_attached_file :export
-  validates_attachment_file_name :export, :matches => /.*/
-  validates_attachment_content_type :export, :content_type => /.*/
+  validates_attachment_file_name :export, matches: /.*/
+  validates_attachment_content_type :export, content_type: /.*/
 
   before_save :prettify_bank_number
 
   def self.phone_number_states
-    [:optional, :required, :disabled]
+    %i[optional required disabled]
   end
 
   def ask_phone_number?
@@ -79,41 +78,40 @@ class Event < ActiveRecord::Base
   end
 
   def prettify_bank_number
-    self.bank_number = IBANTools::IBAN.new(self.bank_number).prettify if bank_number_changed?
+    self.bank_number = IBANTools::IBAN.new(bank_number).prettify if bank_number_changed?
   end
 
   def payment_methods
-    ['wiretransfer', 'mollie']
+    %w[wiretransfer mollie]
   end
 
   def self.payment_methods_scope
     'event.payment_methods'
   end
 
-
   def generate_xls
     self.export_status = 'generating'
-    self.save
+    save
     xls = Spreadsheet::Workbook.new
     sheet = xls.create_worksheet
 
-    sheet.update_row 0, 'Titel', 'Voornaam', 'Achternaam','Email', 'Studentnummer', 'Telefoonnummer', 'Ticket', 'Comment', 'Admin note', 'Te betalen', 'Functie', 'Registratiedatum', 'Partner'
+    sheet.update_row 0, 'Titel', 'Voornaam', 'Achternaam', 'Email', 'Studentnummer', 'Telefoonnummer', 'Ticket', 'Comment', 'Admin note', 'Te betalen', 'Functie', 'Registratiedatum', 'Partner'
     registrations.each.with_index do |reg, i|
       sheet.update_row i + 1, reg.title, reg.firstname, reg.lastname, reg.email, reg.student_number, reg.phone_number, reg.access_levels.first.name, reg.comment, reg.admin_note, reg.to_pay, reg.job_function, reg.created_at, "#{reg.plus_one_title} #{reg.plus_one_firstname} #{reg.plus_one_lastname}"
     end
-    data = Tempfile.new(["export", ".xls"])
+    data = Tempfile.new(['export', '.xls'])
 
     xls.write(data)
 
     self.export = data
     self.export_status = 'done'
-    self.save!
+    save!
     data.close
   end
   handle_asynchronously :generate_xls
 
   def toggle_registration_open
-    self.registration_open = !self.registration_open
-    self.save
+    self.registration_open = !registration_open
+    save
   end
 end

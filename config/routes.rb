@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 Isengard::Application.routes.draw do
   post 'payment_webhook/mollie'
 
   devise_for :partners
   devise_for :users, controllers: {
-    omniauth_callbacks: 'omniauth_callback',
+    omniauth_callbacks: 'omniauth_callback'
   }
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -40,8 +42,8 @@ Isengard::Application.routes.draw do
         get 'resend'
         get 'info'
 
-        get 'cancel/:barcode', to: 'registrations#show_cancel',  as: 'cancel'
-        delete 'cancel/:barcode', to: 'registrations#destroy_cancel',  as: 'cancel_destroy'
+        get 'cancel/:barcode', to: 'registrations#show_cancel', as: 'cancel'
+        delete 'cancel/:barcode', to: 'registrations#destroy_cancel', as: 'cancel_destroy'
       end
 
       collection do
@@ -80,12 +82,10 @@ Isengard::Application.routes.draw do
     end
   end
 
-  patch "events/:event_id/access_level/:access_level_id/set_zones", to: "access_levels#set_zones", as: "set_zones_for_access_level"
+  patch 'events/:event_id/access_level/:access_level_id/set_zones', to: 'access_levels#set_zones', as: 'set_zones_for_access_level'
 
   # Development backdoor
-  if Rails.env.development?
-    post "dev_login", to: "users#login"
-  end
+  post 'dev_login', to: 'users#login' if Rails.env.development?
 
   # Example resource route with options:
   #   resources :products do

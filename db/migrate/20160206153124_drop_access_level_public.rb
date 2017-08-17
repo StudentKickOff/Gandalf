@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropAccessLevelPublic < ActiveRecord::Migration
   def up
     AccessLevel.where(public: false).each do |a|

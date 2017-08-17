@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: clubs
@@ -11,7 +13,6 @@
 #
 
 class Club < ActiveRecord::Base
-
   has_many :events
 
   has_and_belongs_to_many :users
@@ -30,7 +31,7 @@ class Club < ActiveRecord::Base
     ugent = Club.where(internal_name: 'ugent').first
 
     # ordering like it's 1999
-    clubs = Club.except(zeus).except(ugent).sort_by {|c| c.name}
+    clubs = Club.except(zeus).except(ugent).sort_by(&:name)
     [zeus, ugent] + clubs
   end
 end

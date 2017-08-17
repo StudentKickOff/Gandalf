@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddClubColumnToEvent < ActiveRecord::Migration
   def change
     add_column :events, :club, :string

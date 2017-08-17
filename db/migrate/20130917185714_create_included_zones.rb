@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateIncludedZones < ActiveRecord::Migration
   def change
     create_table :included_zones do |t|

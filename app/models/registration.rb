@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: registrations
@@ -35,19 +37,19 @@ class Registration < ActiveRecord::Base
   has_many :accesses, dependent: :destroy
   has_many :access_levels, through: :accesses
 
-  scope :paid, -> { where("price <= paid") }
+  scope :paid, -> { where('price <= paid') }
 
   validates :firstname, presence: true
   validates :lastname, presence: true
   # Names shouldn't be unique, because people can have te same name
-  #validates :name, presence: true, uniqueness: { scope: :event_id }
+  # validates :name, presence: true, uniqueness: { scope: :event_id }
   # Uniqueness temporarily disabled; see the Partner model for the reason
-  #validates :email, presence: true, uniqueness: { scope: :event_id }
+  # validates :email, presence: true, uniqueness: { scope: :event_id }
   validates :email, presence: true, email: true
-  validates :student_number, format: {with: /\A[0-9]*\Z/, message: "has invalid format" },
-     allow_blank: true
-  #TODO: fix student_number uniqueness when having a plus one
-  validates :student_number, presence: true, if: "access_levels.first.try(:requires_login?)"
+  validates :student_number, format: { with: /\A[0-9]*\Z/, message: 'has invalid format' },
+                             allow_blank: true
+  # TODO: fix student_number uniqueness when having a plus one
+  validates :student_number, presence: true, if: 'access_levels.first.try(:requires_login?)'
   validates :paid, presence: true, numericality: { only_integer: true }
   validates :price, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :payment_code, presence: true, uniqueness: true
@@ -60,24 +62,24 @@ class Registration < ActiveRecord::Base
   validates :plus_one_firstname, presence: true, if: 'has_plus_one?'
   validates :plus_one_lastname, presence: true, if: 'has_plus_one?'
 
-  has_paper_trail only: [:paid, :payment_code, :checked_in_at]
+  has_paper_trail only: %i[paid payment_code checked_in_at]
 
   before_validation do |record|
-    if record.payment_code.nil? then
+    if record.payment_code.nil?
       record.payment_code = Registration.create_payment_code
     end
   end
 
   after_save do |record|
     record.access_levels.each do |access_level|
-      if access_level.capacity != nil and access_level.registrations.count > access_level.capacity
-        record.errors.add :access_levels, "type is sold out."
+      if !access_level.capacity.nil? && access_level.registrations.count > access_level.capacity
+        record.errors.add :access_levels, 'type is sold out.'
         raise ActiveRecord::Rollback
       end
     end
   end
 
-  default_scope { order "lastname ASC" }
+  default_scope { order 'lastname ASC' }
 
   def paid
     from_cents read_attribute(:paid)
@@ -88,11 +90,11 @@ class Registration < ActiveRecord::Base
   end
 
   def to_pay
-    self.price - self.paid
+    price - paid
   end
 
   def to_pay=(value)
-    self.paid = self.price - (to_cents(value) / 100.0)
+    self.paid = price - (to_cents(value) / 100.0)
   end
 
   def price
@@ -104,22 +106,22 @@ class Registration < ActiveRecord::Base
   end
 
   def is_paid
-    self.price <= self.paid
+    price <= paid
   end
 
   def generate_barcode
-    self.barcode_data = 12.times.map { SecureRandom.random_number(10) }.join
-    calculated_barcode = Barcodes.create('EAN13', data: self.barcode_data)
+    self.barcode_data = Array.new(12) { SecureRandom.random_number(10) }.join
+    calculated_barcode = Barcodes.create('EAN13', data: barcode_data)
     self.barcode = calculated_barcode.caption_data
-    self.save!
+    save!
   end
 
   def name
-    return "#{self.lastname} #{self.firstname}"
+    "#{lastname} #{firstname}"
   end
 
   def family_name
-     self.lastname
+    lastname
   end
 
   def self.find_payment_code_from_csv(csvline)
@@ -133,15 +135,13 @@ class Registration < ActiveRecord::Base
 
   def self.create_payment_code
     random = rand(10**15)
-    return sprintf("GAN%02d%015d", random % 97, random)
+    format('GAN%02d%015d', random % 97, random)
   end
 
   def deliver
-    if self.barcode.nil?
-      self.generate_barcode
-    end
+    generate_barcode if barcode.nil?
 
-    if self.is_paid
+    if is_paid
       RegistrationMailer.ticket(self).deliver_now
     else
       RegistrationMailer.confirm_registration(self).deliver_now
@@ -149,7 +149,7 @@ class Registration < ActiveRecord::Base
   end
 
   def self.personal_titles
-    [:prof, :dr, :ms, :mr, :mx]
+    %i[prof dr ms mr mx]
   end
 
   def self.personal_titles_scope
@@ -157,9 +157,7 @@ class Registration < ActiveRecord::Base
   end
 
   def salutation
-    unless title
-      return ''
-    end
+    return '' unless title
 
     I18n.t(title, scope: Registration.personal_titles_scope) + ' '
   end
@@ -171,7 +169,7 @@ class Registration < ActiveRecord::Base
   end
 
   def to_cents(value)
-    if value.is_a? String then value.sub!(',', '.') end
+    value.sub!(',', '.') if value.is_a? String
     (value.to_f * 100).to_int
   end
 
@@ -180,13 +178,9 @@ class Registration < ActiveRecord::Base
   end
 
   def comment_required?
-    unless event && event.id == 1
-      return false
-    end
+    return false unless event && event.id == 1
     access_levels.each do |access_level|
-      if access_level.has_comment
-        return true
-      end
+      return true if access_level.has_comment
     end
     false
   end

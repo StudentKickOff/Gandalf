@@ -1,6 +1,7 @@
-class AccessLevelsController < ApplicationController
+# frozen_string_literal: true
 
-  before_filter :authenticate_user!, except: [:show, :new]
+class AccessLevelsController < ApplicationController
+  before_filter :authenticate_user!, except: %i[show new]
 
   respond_to :html, :js
 
@@ -44,13 +45,13 @@ class AccessLevelsController < ApplicationController
     @event = Event.find params.require(:event_id)
     authorize! :update, @event
     access_level = AccessLevel.find params.require(:id)
-    unless access_level.registrations.any?
+    if access_level.registrations.any?
+      render :index
+    else
       # Save the name so we can respond it as we still have to
       # be able to delete it
       @id = access_level.id
       access_level.destroy
-    else
-      render :index
     end
   end
 
@@ -69,12 +70,11 @@ class AccessLevelsController < ApplicationController
     @event = Event.find params.require(:event_id)
     authorize! :update, @event
     @access_level = AccessLevel.find params.require(:id)
-    @access_level.hidden = not(@access_level.hidden)
+    @access_level.hidden = !@access_level.hidden
     @access_level.save
   end
 
   def parse_advanced
     @advanced = params[:advanced] == 'true'
   end
-
 end

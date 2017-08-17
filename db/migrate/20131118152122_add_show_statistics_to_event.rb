@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddShowStatisticsToEvent < ActiveRecord::Migration
   def change
     add_column :events, :show_statistics, :boolean

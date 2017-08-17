@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPaymentMethodToRegistration < ActiveRecord::Migration
   def change
     add_column :registrations, :payment_method, :string

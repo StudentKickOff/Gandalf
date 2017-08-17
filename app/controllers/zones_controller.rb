@@ -1,5 +1,6 @@
-class ZonesController < ApplicationController
+# frozen_string_literal: true
 
+class ZonesController < ApplicationController
   # You need to be logged in for everything.
   before_action :authenticate_user!, except: :show
 
@@ -31,5 +32,4 @@ class ZonesController < ApplicationController
     authorize! :update, @event
     zone.destroy
   end
-
 end

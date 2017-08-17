@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'mollie/api/client'
 
 class RegistrationsController < ApplicationController
-
-  before_action :authenticate_user!, only: [:index, :destroy, :resend, :update, :email, :upload]
+  before_action :authenticate_user!, only: %i[index destroy resend update email upload]
 
   require 'csv'
 
@@ -14,7 +15,7 @@ class RegistrationsController < ApplicationController
     authorize! :read, @event
 
     @registrationsgrid = RegistrationsGrid.new(params[:registrations_grid]) do |scope|
-      scope.where(event_id: @event.id).order("registrations.price - paid DESC")
+      scope.where(event_id: @event.id).order('registrations.price - paid DESC')
     end
 
     @registrations = @registrationsgrid.assets
@@ -85,9 +86,9 @@ class RegistrationsController < ApplicationController
     @registration.save
 
     # Send the confirmation email.
-    if not @registration.errors.any?
-      if @event.allow_plus_one and @registration.has_plus_one
-        plus_one_registration = @event.registrations.new :title => @registration.plus_one_title, :email => @registration.email, :firstname => @registration.plus_one_firstname, :lastname => @registration.plus_one_lastname, :job_function => @registration.job_function, :comment => @registration.comment, :student_number=>@registration.student_number
+    if @registration.errors.none?
+      if @event.allow_plus_one && @registration.has_plus_one
+        plus_one_registration = @event.registrations.new title: @registration.plus_one_title, email: @registration.email, firstname: @registration.plus_one_firstname, lastname: @registration.plus_one_lastname, job_function: @registration.job_function, comment: @registration.comment, student_number: @registration.student_number
         plus_one_registration.access_levels << requested_access_level
         plus_one_registration.price = requested_access_level.price
         plus_one_registration.paid = 0
@@ -118,17 +119,17 @@ class RegistrationsController < ApplicationController
       flash[:success] = t('flash.succes') # or further payment information."
       respond_with @event
     else
-      render "events/show"
+      render 'events/show'
     end
   end
 
   def advanced
-    # TODO can can
+    # TODO: can can
     @event = Event.find params.require(:event_id)
     @registration = @event.registrations.create params.require(:registration).permit(:email, :firstname, :lastname)
     params.require(:registration).require(:checkboxes).each do |access_level, periods|
       periods.each do |period, checked|
-        if checked == "on" then
+        if checked == 'on'
           access = @registration.accesses.build access_level_id: access_level, period_id: period
           access.save
         end
@@ -141,7 +142,7 @@ class RegistrationsController < ApplicationController
     paid = @registration.paid
     authorize! :update, @registration
     @registration.update params.require(:registration).permit(:to_pay)
-    if @registration.paid != paid then
+    if @registration.paid != paid
       if @registration.is_paid
         RegistrationMailer.ticket(@registration).deliver_now
         if @registration.paid > @registration.price
@@ -177,7 +178,6 @@ class RegistrationsController < ApplicationController
 
     begin
       CSV.parse(params.require(:csv_file).read.upcase, col_sep: sep, headers: :first_row) do |row|
-
         registration = Registration.find_payment_code_from_csv(row.to_s)
         # If the registration doesn't exist
         unless registration
@@ -207,10 +207,10 @@ class RegistrationsController < ApplicationController
         counter += 1
       end
 
-      success_msg = "Updated #{ActionController::Base.helpers.pluralize counter, "payment"} successfully."
+      success_msg = "Updated #{ActionController::Base.helpers.pluralize counter, 'payment'} successfully."
       if fails.any?
         flash.now[:success] = success_msg
-        flash.now[:error] = "The rows listed below contained an invalid code, please fix them by hand."
+        flash.now[:error] = 'The rows listed below contained an invalid code, please fix them by hand.'
         @csvheaders = fails.first.headers
         @csvfails = fails
         render 'upload'
@@ -219,25 +219,23 @@ class RegistrationsController < ApplicationController
         redirect_to action: :index
       end
     rescue CSV::MalformedCSVError
-      flash[:error] = "The file could not be parsed. Make sure that you uploaded the correct file and that the column seperator settings have been set to the correct seperator."
+      flash[:error] = 'The file could not be parsed. Make sure that you uploaded the correct file and that the column seperator settings have been set to the correct seperator.'
       redirect_to action: :index
     end
-
   end
 
   def create_mollie_payment
     mollie = Mollie::API::Client.new(Rails.application.secrets.mollie_api_key)
 
     payment = mollie.payments.create(
-        amount:       @registration.price,
-        description:  'Ticket: ' + @registration.event.name,
-        redirect_url: url_for(@registration.event),
-        webhook_url:  url_for(controller: :payment_webhook, action: 'mollie'),
-        metadata:     { registration_id: @registration.id}
+      amount:       @registration.price,
+      description:  'Ticket: ' + @registration.event.name,
+      redirect_url: url_for(@registration.event),
+      webhook_url:  url_for(controller: :payment_webhook, action: 'mollie'),
+      metadata:     { registration_id: @registration.id }
     )
-    @registration.payment_id=payment.id
+    @registration.payment_id = payment.id
     @registration.save!
     payment
   end
-
 end

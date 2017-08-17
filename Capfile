@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Load DSL and Setup Up Stages
 require 'capistrano/setup'
 
@@ -5,11 +7,11 @@ require 'capistrano/setup'
 require 'capistrano/deploy'
 
 require 'capistrano/rails'
-#require 'capistrano/rvm'
+# require 'capistrano/rvm'
 require 'capistrano/rbenv'
 
 # Whenever recipe
-require "whenever/capistrano"
+require 'whenever/capistrano'
 
 # Loads custom tasks from `lib/capistrano/tasks' if you have any defined.
 Dir.glob('lib/capistrano/tasks/*.cap').each { |r| import r }

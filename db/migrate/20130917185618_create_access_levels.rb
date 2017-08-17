@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateAccessLevels < ActiveRecord::Migration
   def change
     create_table :access_levels do |t|

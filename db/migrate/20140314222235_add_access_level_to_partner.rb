@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddAccessLevelToPartner < ActiveRecord::Migration
   def up
     add_reference :partners, :access_level, index: true

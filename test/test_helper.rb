@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 # Coverage testing
 require 'simplecov'
 require 'coveralls'
-
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
@@ -9,7 +10,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 ]
 SimpleCov.start
 
-ENV["RAILS_ENV"] ||= "test"
+ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 
@@ -23,12 +24,12 @@ require 'webmock/minitest'
 I18n.enforce_available_locales = false
 
 class Minitest::Test
-  def stub_env(new_env, &block)
+  def stub_env(new_env)
     original_env = Rails.env
-    Rails.instance_variable_set("@_env", new_env.inquiry)
-    block.call
+    Rails.instance_variable_set('@_env', new_env.inquiry)
+    yield
   ensure
-    Rails.instance_variable_set("@_env", original_env.inquiry)
+    Rails.instance_variable_set('@_env', original_env.inquiry)
   end
 end
 
