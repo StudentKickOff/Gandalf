@@ -2,14 +2,14 @@
 # lock '3.1.0'
 
 set :application, 'Gandalf'
-set :repo_url, 'git@github.com:ZeusWPI/Gandalf.git'
+set :repo_url, 'git@github.com:StudentKickOff/Gandalf.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
 
 # Default deploy_to directory is /var/www/my_app
 set :branch, 'master'
-set :deploy_to, '/home/gandalf/production'
+set :deploy_to, '/var/www/events.studentkickoff.be'
 
 # Default value for :linked_files is []
 set :linked_files, %w{config/database.yml config/secrets.yml}
