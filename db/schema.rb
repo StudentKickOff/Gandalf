@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160206153124) do
+ActiveRecord::Schema.define(version: 20190813140647) do
 
   create_table "access_levels", force: :cascade do |t|
     t.string   "name"
@@ -197,6 +197,7 @@ ActiveRecord::Schema.define(version: 20160206153124) do
     t.string   "cas_mail"
     t.string   "cas_uid"
     t.boolean  "admin"
+    t.string   "email"
   end
 
   add_index "users", ["username"], name: "index_users_on_username", unique: true
