@@ -1,4 +1,4 @@
-server 'studentkickoff.be', user: 'event', roles: %w{web app db}
+server 'studentkickoff.be', user: 'events', roles: %w{web app db}
 
 set :rails_env, 'production'
 set :rbenv_type, :system
