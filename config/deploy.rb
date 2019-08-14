@@ -24,6 +24,8 @@ set :log_level, :debug
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5
+#
+set :rbenv_path, '/var/www/events.studentkickoff.be/.rbenv'
 
 namespace :deploy do
 
